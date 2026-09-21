@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Supermarket POS & Audit System" data-ar="نظام نقاط البيع والتدقيق">Supermarket POS & Audit System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e7e34;
+            --primary-dark: #155724;
+            --primary-light: #e8f5e9;
+            --accent: #0288d1;
+            --bg: #f4f7f6;
+            --card: #ffffff;
+            --text: #212529;
+            --text-muted: #6c757d;
+            --border: #dee2e6;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* Top Navbar */
+        .navbar {
+            background-color: var(--primary);
+            color: white;
+            padding: 14px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-badge {
+            font-size: 11px;
+            background: rgba(255,255,255,0.25);
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            color: white;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        /* Layout Grid */
+        .pos-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 960px) {
+            .pos-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scanner & Cart Cards */
+        .card {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 22px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Barcode Scanner Input */
+        .scanner-box {
+            background: var(--primary-light);
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .scanner-box label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+
+        .scanner-input {
+            width: 100%;
+            max-width: 480px;
+            padding: 14px 18px;
+            font-size: 20px;
+            font-weight: 600;
+            font-family: monospace;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            text-align: center;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(30,126,52,0.15);
+            transition: all 0.2s;
+        }
+
+        .scanner-input:focus {
+            box-shadow: 0 0 0 4px rgba(30,126,52,0.25);
+        }
+
+        .scanner-hints {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* Quick Barcode Buttons */
+        .quick-barcodes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        .quick-btn {
+            background: white;
+            border: 1px solid var(--primary);
+            color: var(--primary-dark);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .quick-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Cart Table */
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+        }
+
+        .cart-table th, .cart-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .cart-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .qty-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .qty-btn {
+            width: 26px;
+            height: 26px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:hover {
+            background: #eee;
+        }
+
+        .remove-btn {
+            color: var(--danger);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Cart Summary & Checkout */
+        .cart-summary {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            padding-top: 10px;
+            border-top: 2px dashed var(--border);
+            margin-top: 8px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), #218838);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 14px;
+            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .checkout-btn:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .checkout-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Recent Transactions Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Modal Thermal Receipt */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 420px;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+        .receipt-slip {
+            background: #fffef9;
+            border: 1px dashed #bbb;
+            padding: 18px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+        }
+
+        .receipt-slip h4 {
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .receipt-slip p {
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .receipt-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .receipt-total {
+            border-top: 1px dashed #333;
+            border-bottom: 1px dashed #333;
+            padding: 6px 0;
+            margin: 8px 0;
+            font-weight: bold;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .modal-overlay, .receipt-slip, .receipt-slip * {
+                visibility: visible;
+            }
+            .receipt-slip {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: none;
+            }
+            .modal-actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div class="navbar">
+        <div class="brand">
+            <i class="fa fa-cash-register"></i>
+            <span data-en="Supermarket POS" data-ar="نظام نقاط البيع">Supermarket POS</span>
+            <span class="brand-badge" data-en="High Throughput" data-ar="إنتاجية عالية">High Throughput</span>
+        </div>
+        <div class="nav-actions">
+            <a href="/admin" class="nav-btn" data-en="📊 Admin Datasets & Audit" data-ar="📊 لوحة التدقيق والمخزون">
+                <i class="fa fa-chart-line"></i> <span data-en="Admin & Audit" data-ar="لوحة التدقيق">Admin & Audit</span>
+            </a>
+            <button class="nav-btn" onclick="toggleLanguage()">
+                <i class="fa fa-globe"></i> <span>العربية / EN</span>
+            </button>
+            <a href="/logout" class="nav-btn" style="background:rgba(220,53,69,.25);border-color:rgba(220,53,69,.4);" title="Sign Out">
+                <i class="fa fa-right-from-bracket"></i> <span data-en="Sign Out" data-ar="تسجيل خروج">Sign Out</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Main POS Grid -->
+        <div class="pos-grid">
+            <!-- Left: Barcode Scanner & Search -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-barcode"></i>
+                        <span data-en="Laser Scanner Input" data-ar="مدخل الماسح الضوئي">Laser Scanner Input</span>
+                    </div>
+                    <span id="scan-feedback" style="font-size: 12px; font-weight: 600; color: var(--primary);">
+                        <i class="fa fa-circle text-success" style="font-size: 9px;"></i> <span data-en="Ready to Scan" data-ar="جاهز للمسح">Ready to Scan</span>
+                    </span>
+                </div>
+
+                <div class="scanner-box">
+                    <label for="barcode-input" data-en="Scan Barcode or Enter Product Code:" data-ar="امسح الرمز الشريطي أو اكتب معرف المنتج:">
+                        Scan Barcode or Enter Product Code:
+                    </label>
+                    <input type="text" id="barcode-input" class="scanner-input" placeholder="e.g. P001, P002..." autofocus autocomplete="off">
+                    <div class="scanner-hints" data-en="Continuous auto-focus enabled. Press Enter or scan laser to add." data-ar="التركيز التلقائي مفعّل. اضغط Enter أو امسح لإضافة المنتج.">
+                        Continuous auto-focus enabled. Press Enter or scan laser to add.
+                    </div>
+
+                    <!-- Quick Sample Barcode Buttons -->
+                    <div class="quick-barcodes">
+                        <button type="button" class="quick-btn" onclick="addSampleBarcode('P001')">P001 (Mouse)</button>
+                        <button type="button" class="quick-btn" onclick="addSampleBarcode('P002')">P002 (Keyboard)</button>
+                        <button type="button" class="quick-btn" onclick="addSampleBarcode('P003')">P003 (Desk)</button>
+                        <button type="button" class="quick-btn" onclick="addSampleBarcode('P004')">P004 (Chair)</button>
+                        <button type="button" class="quick-btn" onclick="addSampleBarcode('P005')">P005 (Hub)</button>
+                    </div>
+                </div>
+
+                <div id="product-info-banner" style="display: none; padding: 12px; border-radius: 6px; background: #e3f2fd; border-left: 4px solid var(--accent); margin-bottom: 12px;">
+                    <div style="font-weight: bold;" id="banner-name">Product Name</div>
+                    <div style="font-size: 13px; color: #555;">Price: <span id="banner-price">$0.00</span> | In Stock: <span id="banner-stock">0</span></div>
+                </div>
+            </div>
+
+            <!-- Right: Active Customer Cart -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-shopping-basket"></i>
+                        <span data-en="Current Transaction Cart" data-ar="سلة المشتريات الحالية">Current Transaction Cart</span>
+                    </div>
+                    <button type="button" onclick="clearCart()" style="font-size: 12px; background: none; border: none; color: var(--danger); cursor: pointer;">
+                        <i class="fa fa-trash"></i> <span data-en="Clear" data-ar="تفريغ">Clear</span>
+                    </button>
+                </div>
+
+                <div style="max-height: 280px; overflow-y: auto;">
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th data-en="Item" data-ar="المنتج">Item</th>
+                                <th data-en="Qty" data-ar="الكمية">Qty</th>
+                                <th data-en="Price" data-ar="السعر">Price</th>
+                                <th data-en="Total" data-ar="المجموع">Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-body">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;" data-en="No items scanned yet. Scan a barcode to start." data-ar="لم يتم مسح أي منتج بعد.">
+                                    No items scanned yet. Scan a barcode to start.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span data-en="Total Items:" data-ar="إجمالي الأصناف:">Total Items:</span>
+                        <span id="summary-items-count">0</span>
+                    </div>
+                    <div class="summary-total">
+                        <span data-en="Grand Total:" data-ar="المبلغ الإجمالي:">Grand Total:</span>
+                        <span id="summary-grand-total">$0.00</span>
+                    </div>
+
+                    <button id="btn-checkout" class="checkout-btn" onclick="executeCheckout()" disabled>
+                        <i class="fa fa-check-circle"></i>
+                        <span data-en="Complete Sale & Print Receipt" data-ar="إتمام البيع وطباعة الإيصال">Complete Sale & Print Receipt</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions History -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fa fa-history"></i>
+                    <span data-en="Live Transaction Spreadsheet (Recent Entries)" data-ar="جدول المعاملات الحية (الإدخالات الأخيرة)">Live Transaction Spreadsheet (Recent Entries)</span>
+                </div>
+                <span style="font-size: 12px; color: var(--text-muted);"><i class="fa fa-bolt mr-1"></i> SQLite WAL Synchronized</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th data-en="Sale ID" data-ar="معرف البيع">Sale ID</th>
+                            <th data-en="Product ID" data-ar="معرف المنتج">Product ID</th>
+                            <th data-en="Product Name" data-ar="اسم المنتج">Product Name</th>
+                            <th data-en="Quantity" data-ar="الكمية">Quantity</th>
+                            <th data-en="Price" data-ar="السعر">Price</th>
+                            <th data-en="Total Amount" data-ar="الإجمالي">Total Amount</th>
+                            <th data-en="Sale Date" data-ar="التاريخ">Sale Date</th>
+                            <th data-en="Customer" data-ar="العميل">Customer</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-sales-body">
+                        {% for s in recent_sales %}
+                        <tr>
+                            <td><code>{{ s.sale_id }}</code></td>
+                            <td>{{ s.product_id }}</td>
+                            <td><strong>{{ s.product_name }}</strong></td>
+                            <td>{{ s.quantity }}</td>
+                            <td>${{ "%.2f"|format(s.price) }}</td>
+                            <td><strong>${{ "%.2f"|format(s.total) }}</strong></td>
+                            <td>{{ s.sale_date }}</td>
+                            <td>{{ s.customer_id }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receipt-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="receipt-slip" id="printable-receipt">
+                <h4 data-en="SUPERMARKET AUDIT SYSTEM" data-ar="نظام التدقيق ونقاط البيع">SUPERMARKET AUDIT SYSTEM</h4>
+                <p>Tax Invoice / Official Receipt</p>
+                <div class="receipt-line">
+                    <span>Receipt No:</span>
+                    <span id="rcp-id">RCP-0000</span>
+                </div>
+                <div class="receipt-line">
+                    <span>Date / Time:</span>
+                    <span id="rcp-time">-</span>
+                </div>
+                <div class="receipt-line">
+                    <span>Cashier:</span>
+                    <span>Admin Register #1</span>
+                </div>
+                <hr style="margin: 8px 0; border: none; border-top: 1px dashed #aaa;">
+                <div id="rcp-items-list">
+                    <!-- Dynamic Receipt Items -->
+                </div>
+                <div class="receipt-total">
+                    <span>TOTAL:</span>
+                    <span id="rcp-total">$0.00</span>
+                </div>
+                <p style="margin-top: 10px;">Thank you for shopping with us!<br>Please retain this receipt.</p>
+            </div>
+            <div class="modal-actions" style="display: flex; gap: 10px;">
+                <button onclick="window.print()" class="nav-btn" style="background: var(--accent); flex: 1; justify-content: center;">
+                    <i class="fa fa-print"></i> <span data-en="Print Receipt" data-ar="طباعة">Print</span>
+                </button>
+                <button onclick="closeReceiptModal()" class="nav-btn" style="background: var(--primary); flex: 1; justify-content: center;">
+                    <i class="fa fa-user-plus"></i> <span data-en="Next Customer" data-ar="العميل التالي">Next Customer</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cart = [];
+        let audioCtx = null;
+
+        // Beep sound on scan
+        function playBeep() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); // 880Hz A5
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } catch (e) {}
+        }
+
+        // Keep scanner focused automatically
+        const barcodeInput = document.getElementById("barcode-input");
+        window.onload = () => {
+            barcodeInput.focus();
+            document.addEventListener("click", (e) => {
+                if (!['BUTTON', 'INPUT', 'A'].includes(e.target.tagName)) {
+                    barcodeInput.focus();
+                }
+            });
+        };
+
+        // Handle Enter key on barcode scanner
+        barcodeInput.addEventListener("keydown", async (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const code = barcodeInput.value.trim();
+                if (code) {
+                    await scanProduct(code);
+                    barcodeInput.value = "";
+                }
+            }
+        });
+
+        function addSampleBarcode(code) {
+            scanProduct(code);
+        }
+
+        // Product lookup & add to cart
+        async function scanProduct(barcode) {
+            const feedback = document.getElementById("scan-feedback");
+            feedback.innerHTML = `<i class="fa fa-spinner fa-spin text-info"></i> Querying...`;
+
+            try {
+                const res = await fetch(`/api/v1/product/${encodeURIComponent(barcode)}`);
+                if (!res.ok) {
+                    feedback.innerHTML = `<span style="color: var(--danger);"><i class="fa fa-times-circle"></i> Not Found (${barcode})</span>`;
+                    return;
+                }
+                const product = await res.json();
+                playBeep();
+
+                // Add or increment in cart
+                const existing = cart.find(i => i.product_id.toUpperCase() === product.product_id.toUpperCase());
+                if (existing) {
+                    if (existing.quantity + 1 > product.product_amount_left) {
+                        alert(`Only ${product.product_amount_left} units of ${product.product_name} in stock!`);
+                        feedback.innerHTML = `<span style="color: var(--warning);"><i class="fa fa-exclamation-triangle"></i> Max stock reached</span>`;
+                        return;
+                    }
+                    existing.quantity += 1;
+                } else {
+                    if (product.product_amount_left < 1) {
+                        alert(`${product.product_name} is currently out of stock!`);
+                        feedback.innerHTML = `<span style="color: var(--danger);"><i class="fa fa-times-circle"></i> Out of stock</span>`;
+                        return;
+                    }
+                    cart.push({
+                        product_id: product.product_id,
+                        product_name: product.product_name,
+                        price: product.product_price,
+                        quantity: 1,
+                        max_stock: product.product_amount_left
+                    });
+                }
+
+                renderCart();
+                feedback.innerHTML = `<span style="color: var(--primary);"><i class="fa fa-check-circle"></i> Added ${product.product_name}</span>`;
+
+                // Show product preview banner
+                document.getElementById("banner-name").innerText = product.product_name;
+                document.getElementById("banner-price").innerText = `$${product.product_price.toFixed(2)}`;
+                document.getElementById("banner-stock").innerText = product.product_amount_left;
+                document.getElementById("product-info-banner").style.display = "block";
+
+            } catch (err) {
+                feedback.innerHTML = `<span style="color: var(--danger);">Network error</span>`;
+            }
+        }
+
+        function renderCart() {
+            const tbody = document.getElementById("cart-body");
+            const btnCheckout = document.getElementById("btn-checkout");
+
+            if (cart.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No items scanned yet. Scan a barcode to start.</td></tr>`;
+                document.getElementById("summary-items-count").innerText = "0";
+                document.getElementById("summary-grand-total").innerText = "$0.00";
+                btnCheckout.disabled = true;
+                return;
+            }
+
+            tbody.innerHTML = "";
+            let total = 0;
+            let totalQty = 0;
+
+            cart.forEach((item, index) => {
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+                totalQty += item.quantity;
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${item.product_name}</strong><br><small style="color: #666;">${item.product_id}</small></td>
+                    <td>
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+                        </div>
+                    </td>
+                    <td>$${item.price.toFixed(2)}</td>
+                    <td><strong>$${subtotal.toFixed(2)}</strong></td>
+                    <td><button class="remove-btn" onclick="removeItem(${index})"><i class="fa fa-times"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById("summary-items-count").innerText = totalQty;
+            document.getElementById("summary-grand-total").innerText = `$${total.toFixed(2)}`;
+            btnCheckout.disabled = false;
+        }
+
+        function updateQty(index, delta) {
+            const item = cart[index];
+            const newQty = item.quantity + delta;
+            if (newQty <= 0) {
+                cart.splice(index, 1);
+            } else if (newQty > item.max_stock) {
+                alert(`Cannot add more. Only ${item.max_stock} units left in stock.`);
+            } else {
+                item.quantity = newQty;
+            }
+            renderCart();
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            renderCart();
+        }
+
+        function clearCart() {
+            cart = [];
+            renderCart();
+            document.getElementById("product-info-banner").style.display = "none";
+        }
+
+        // Complete Checkout API Call
+        async function executeCheckout() {
+            if (cart.length === 0) return;
+            const btn = document.getElementById("btn-checkout");
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Processing Transaction...`;
+
+            try {
+                const payload = {
+                    items: cart.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
+                    customer_id: "C" + Math.floor(100 + Math.random() * 900)
+                };
+
+                const res = await fetch('/api/v1/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    alert('Checkout failed: ' + (data.message || data.error));
+                    return;
+                }
+
+                // Show Receipt Modal
+                document.getElementById("rcp-id").innerText = data.receipt_id;
+                document.getElementById("rcp-time").innerText = data.timestamp;
+                document.getElementById("rcp-total").innerText = `$${data.total.toFixed(2)}`;
+
+                const rcpList = document.getElementById("rcp-items-list");
+                rcpList.innerHTML = "";
+                data.items.forEach(it => {
+                    const row = document.createElement("div");
+                    row.className = "receipt-line";
+                    row.innerHTML = `<span>${it.quantity}x ${it.product_name}</span><span>$${it.subtotal.toFixed(2)}</span>`;
+                    rcpList.appendChild(row);
+                });
+
+                document.getElementById("receipt-modal").style.display = "flex";
+                clearCart();
+
+            } catch (err) {
+                alert('Network error during checkout: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa fa-check-circle"></i> Complete Sale & Print Receipt`;
+            }
+        }
+
+        function closeReceiptModal() {
+            document.getElementById("receipt-modal").style.display = "none";
+            location.reload(); // Refresh to update recent transaction table
+        }
+
+        // Language Toggle (English / Arabic)
+        let currentLang = 'en';
+        function toggleLanguage() {
+            const root = document.getElementById('html-root');
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            root.setAttribute('lang', currentLang);
+            root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+
+            document.querySelectorAll('[data-en]').forEach(el => {
+                if (el.tagName === 'INPUT') {
+                    if (el.hasAttribute(`data-${currentLang}`)) {
+                        el.placeholder = el.getAttribute(`data-${currentLang}`);
+                    }
+                } else {
+                    el.innerText = el.getAttribute(`data-${currentLang}`);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+/* styling for admin page box, title sizes, placements */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* The Admin/Login Box container */
+body > form, .login-box {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 320px;
+}
+
+/* Title size and spacing */
+h1 {
+    font-size: 20px;
+    color: #333333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Label styling */
+label {
+    display: block;
+    font-size: 14px;
+    color: #555555;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Inputs placement and styling */
+#username, #password {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensures padding doesn't overflow width */
+    font-size: 14px;
+}
+
+/* Button placement and styling */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #1b5e20;
+}
+
+/* Error message styling */

@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: supermarket_pos_app
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - THREADS=16
+    volumes:
+      - ./data:/app/data
+    restart: always

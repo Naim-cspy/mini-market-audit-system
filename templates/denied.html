@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Access Denied — Supermarket POS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --danger:   #c0392b;
+      --danger-lt:#fdecea;
+      --primary:  #1e7e34;
+      --text:     #1a2621;
+      --muted:    #6b7c74;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 20px;
+      background: #f9f0f0;
+      background-image:
+        radial-gradient(ellipse at 10% 20%, rgba(192,57,43,.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 90% 80%, rgba(30,126,52,.07) 0%, transparent 55%);
+    }
+
+    .card {
+      max-width: 500px;
+      width: 100%;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(192,57,43,.14), 0 2px 8px rgba(0,0,0,.07);
+      overflow: hidden;
+      animation: pop .4s cubic-bezier(.22,1,.36,1);
+    }
+
+    @keyframes pop {
+      from { opacity: 0; transform: scale(.92); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .card-banner {
+      background: linear-gradient(135deg, #922b21, var(--danger));
+      padding: 40px 32px 30px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-banner::before {
+      content: "";
+      position: absolute;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
+      top: -50px; right: -40px;
+    }
+
+    .shield-ring {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      border: 2px solid rgba(255,255,255,.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 16px;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,.2); }
+      50%      { box-shadow: 0 0 0 14px rgba(255,255,255,.0); }
+    }
+
+    .card-banner h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+    .card-banner p  { font-size: 13px; opacity: .8; }
+
+    .card-body {
+      padding: 32px;
+      text-align: center;
+    }
+
+    .info-box {
+      background: var(--danger-lt);
+      border: 1px solid #f5c6c6;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 26px;
+    }
+
+    .info-box p {
+      font-size: 14px;
+      color: var(--danger);
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .user-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #f3f4f6;
+      border: 1px solid #e0e0e0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    .user-chip .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #f39c12;
+    }
+
+    .desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #155724, var(--primary));
+      color: white;
+      box-shadow: 0 4px 14px rgba(30,126,52,.3);
+    }
+
+    .btn-outline {
+      background: white;
+      color: var(--text);
+      border: 1.5px solid #d0d5d2;
+      box-shadow: 0 2px 6px rgba(0,0,0,.06);
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 24px 0;
+    }
+
+    .contact-section { font-size: 13px; color: var(--muted); }
+    .contact-section strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-banner">
+    <div class="shield-ring">
+      <i class="fa fa-shield-halved"></i>
+    </div>
+    <h1>Access Denied</h1>
+    <p>You don't have permission to view this page.</p>
+  </div>
+
+  <div class="card-body">
+    <div class="user-chip">
+      <div class="dot"></div>
+      <i class="fa fa-user"></i>
+      Logged in as: <strong>{{ user.username }}</strong> ({{ user.role }})
+    </div>
+
+    <div class="info-box">
+      <p>
+        <i class="fa fa-circle-exclamation" style="margin-right:6px;"></i>
+        The <strong>Admin Panel</strong> requires Administrator privileges.<br>
+        Your current role — <em>{{ user.role }}</em> — is not authorised to access this area.
+      </p>
+    </div>
+
+    <p class="desc">
+      If you believe this is a mistake, or if you need access to the admin panel,
+      please <strong>contact your system administrator</strong> to have your role upgraded.
+    </p>
+
+    <div class="actions">
+      <a href="/" class="btn btn-primary">
+        <i class="fa fa-cash-register"></i> Return to Cashier POS
+      </a>
+      <a href="/logout" class="btn btn-outline">
+        <i class="fa fa-right-from-bracket"></i> Sign Out
+      </a>
+    </div>
+
+    <hr class="divider">
+
+    <div class="contact-section">
+      <i class="fa fa-envelope" style="margin-right:5px;color:#f39c12;"></i>
+      Contact your admin to request elevated access permissions.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

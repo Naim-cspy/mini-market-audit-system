@@ -1,0 +1,6 @@
+product_id,product_name,product_price,product_amount_left,product_amount_sold,date_sold,date_filled,product_type
+P001,Wireless Mouse,25.99,4892,304,2026-09-21,2026-05-15,Electronics
+P002,Mechanical Keyboard,79.99,4895,226,2026-09-21,2026-05-10,Electronics
+P003,Standing Desk,299.5,4897,133,2026-09-17,2026-04-20,Furniture
+P004,Ergonomic Chair,199.99,4896,169,2026-09-17,2026-05-01,Furniture
+P005,USB-C Hub,19.99,4898,312,2026-09-17,2026-05-25,Electronics

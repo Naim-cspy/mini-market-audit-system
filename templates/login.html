@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" id="html-root">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Supermarket POS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:      #1e7e34;
+      --primary-dk:   #155724;
+      --primary-lt:   #e8f5e9;
+      --accent:       #0288d1;
+      --surface:      #ffffff;
+      --bg:           #f0f4f0;
+      --text:         #1a2621;
+      --muted:        #6b7c74;
+      --border:       #d4e0d6;
+      --danger:       #c0392b;
+      --radius:       14px;
+      --shadow:       0 8px 32px rgba(30,126,52,.14), 0 2px 8px rgba(0,0,0,.07);
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      padding: 20px;
+      /* Subtle animated diagonal gradient */
+      background-image:
+        radial-gradient(ellipse at 20% 30%, rgba(30,126,52,.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 70%, rgba(2,136,209,.08) 0%, transparent 55%);
+    }
+
+    /* ── Card ───────────────────────────────────────────── */
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: slideUp .45s cubic-bezier(.22,1,.36,1);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Header banner ─────────────────────────────────── */
+    .card-banner {
+      background: linear-gradient(135deg, var(--primary-dk) 0%, var(--primary) 100%);
+      padding: 36px 32px 28px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-banner::before {
+      content: "";
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 130px; height: 130px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+    }
+
+    .card-banner::after {
+      content: "";
+      position: absolute;
+      bottom: -50px; left: -30px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.05);
+    }
+
+    .logo-ring {
+      width: 68px; height: 68px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      border: 2px solid rgba(255,255,255,.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 14px;
+      backdrop-filter: blur(4px);
+    }
+
+    .card-banner h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .card-banner p  { font-size: 13px; opacity: .8; }
+
+    /* ── Body ───────────────────────────────────────────── */
+    .card-body { padding: 32px; }
+
+    .field { margin-bottom: 20px; }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 7px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap .icon {
+      position: absolute;
+      left: 14px;
+      color: var(--muted);
+      font-size: 15px;
+      pointer-events: none;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-size: 15px;
+      color: var(--text);
+      background: #fafafa;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+
+    .input-wrap input:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(30,126,52,.12);
+    }
+
+    /* toggle password eye */
+    .eye-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px;
+      font-size: 15px;
+      transition: color .2s;
+    }
+    .eye-btn:hover { color: var(--primary); }
+
+    /* ── Error alert ────────────────────────────────────── */
+    .alert {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .alert-error {
+      background: #fdecea;
+      color: var(--danger);
+      border: 1px solid #f5c6c6;
+    }
+
+    .alert.visible { display: flex; animation: fadeIn .25s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ── Submit button ─────────────────────────────────── */
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--primary-dk), var(--primary));
+      color: white;
+      border: none;
+      border-radius: 9px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(30,126,52,.3);
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+    }
+
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(30,126,52,.38);
+    }
+
+    .btn-login:active:not(:disabled) { transform: translateY(0); }
+
+    .btn-login:disabled { opacity: .65; cursor: not-allowed; }
+
+    /* spinner inside button */
+    .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,.35);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer ────────────────────────────────────────── */
+    .card-footer {
+      text-align: center;
+      padding: 14px 32px 22px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    .hint-chip {
+      display: inline-block;
+      background: var(--primary-lt);
+      color: var(--primary-dk);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    /* ── Role badge that appears after success ─────────── */
+    .role-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-lt);
+      border: 1px solid #c8e6c9;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary-dk);
+    }
+    .role-badge.visible { display: flex; animation: fadeIn .3s; }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+  <!-- Banner -->
+  <div class="card-banner">
+    <div class="logo-ring">
+      <i class="fa fa-cash-register"></i>
+    </div>
+    <h1>Welcome Back</h1>
+    <p>Supermarket POS &amp; Financial Audit System</p>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body">
+
+    <!-- Error message -->
+    <div id="alert-box" class="alert alert-error" role="alert">
+      <i class="fa fa-circle-exclamation"></i>
+      <span id="alert-text">Incorrect username or password.</span>
+    </div>
+
+    <!-- Success role banner -->
+    <div id="role-banner" class="role-badge">
+      <i class="fa fa-check-circle"></i>
+      <span id="role-text">Logging in…</span>
+    </div>
+
+    <!-- Username field -->
+    <div class="field">
+      <label for="username"><i class="fa fa-user" style="margin-right:5px;color:var(--primary)"></i>Username</label>
+      <div class="input-wrap">
+        <i class="icon fa fa-user"></i>
+        <input type="text" id="username" name="username"
+               placeholder="Enter your username"
+               autocomplete="username" autofocus>
+      </div>
+    </div>
+
+    <!-- Password field -->
+    <div class="field">
+      <label for="password"><i class="fa fa-lock" style="margin-right:5px;color:var(--primary)"></i>Password</label>
+      <div class="input-wrap">
+        <i class="icon fa fa-lock"></i>
+        <input type="password" id="password" name="password"
+               placeholder="Enter your password"
+               autocomplete="current-password">
+        <button type="button" class="eye-btn" id="eye-btn" title="Toggle visibility">
+          <i class="fa fa-eye" id="eye-icon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button class="btn-login" id="btn-login" onclick="doLogin()">
+      <div class="spinner" id="spinner"></div>
+      <i class="fa fa-right-to-bracket" id="btn-icon"></i>
+      <span id="btn-text">Sign In</span>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <div class="card-footer">
+    <div class="hint-chip"><i class="fa fa-shield-halved"></i> SHA-256 Secured</div><br>
+    Passwords are hashed in your browser before transmission.
+  </div>
+</div>
+
+<script>
+  /* ── SHA-256 using native WebCrypto (no libraries needed) ─── */
+  async function sha256(message) {
+    const data    = new TextEncoder().encode(message);
+    const hash    = await crypto.subtle.digest("SHA-256", data);
+    const bytes   = Array.from(new Uint8Array(hash));
+    return bytes.map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  /* ── Password eye toggle ─────────────────────────────────── */
+  document.getElementById("eye-btn").addEventListener("click", () => {
+    const pw   = document.getElementById("password");
+    const icon = document.getElementById("eye-icon");
+    if (pw.type === "password") {
+      pw.type = "text";
+      icon.className = "fa fa-eye-slash";
+    } else {
+      pw.type = "password";
+      icon.className = "fa fa-eye";
+    }
+  });
+
+  /* ── Enter key submits ───────────────────────────────────── */
+  document.addEventListener("keydown", e => {
+    if (e.key === "Enter") doLogin();
+  });
+
+  /* ── Show / hide helpers ─────────────────────────────────── */
+  function showError(msg) {
+    const box = document.getElementById("alert-box");
+    document.getElementById("alert-text").innerText = msg;
+    box.classList.add("visible");
+  }
+
+  function hideError() {
+    document.getElementById("alert-box").classList.remove("visible");
+  }
+
+  function setLoading(on) {
+    const btn     = document.getElementById("btn-login");
+    const spinner = document.getElementById("spinner");
+    const icon    = document.getElementById("btn-icon");
+    const text    = document.getElementById("btn-text");
+    btn.disabled        = on;
+    spinner.style.display = on ? "block" : "none";
+    icon.style.display  = on ? "none"  : "inline";
+    text.innerText      = on ? "Authenticating…" : "Sign In";
+  }
+
+  /* ── Main login handler ──────────────────────────────────── */
+  async function doLogin() {
+    hideError();
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+      showError("Please enter both your username and password.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      /* Hash password in the browser – plain text never leaves the device */
+      const passwordHash = await sha256(password);
+
+      const next = new URLSearchParams(window.location.search).get("next") || "/";
+
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password_hash: passwordHash, next })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        const roleBanner = document.getElementById("role-banner");
+        const roleLabel  = data.role === "admin"
+          ? `Welcome back, ${username}! Signing in as Administrator…`
+          : `Welcome, ${username}! Redirecting to Cashier POS…`;
+
+        document.getElementById("role-text").innerText = roleLabel;
+        roleBanner.classList.add("visible");
+
+        setTimeout(() => {
+          window.location.href = data.redirect || "/";
+        }, 900);
+      } else {
+        showError(data.error || "Incorrect username or password.");
+        /* Shake the card on error */
+        const card = document.querySelector(".login-card");
+        card.style.animation = "none";
+        card.offsetHeight;   // reflow
+        card.style.animation = "shake .4s ease";
+        setLoading(false);
+      }
+    } catch (err) {
+      showError("Network error. Please check your connection.");
+      setLoading(false);
+    }
+  }
+</script>
+
+<style>
+  @keyframes shake {
+    0%,100%  { transform: translateX(0); }
+    20%      { transform: translateX(-8px); }
+    40%      { transform: translateX(8px); }
+    60%      { transform: translateX(-5px); }
+    80%      { transform: translateX(5px); }
+  }
+</style>
+
+</body>
+</html>
